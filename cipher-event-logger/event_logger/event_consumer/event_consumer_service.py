@@ -99,7 +99,7 @@ class EventConsumerService(object):
 
     def process_log(
         self,  event_log_object: EventLogObject,
-        event_directory_path: Path, event_type_file_name='OTHER LOG'
+        event_directory_path: Path, event_type_file_name='INFO'
     ):
         """ Processes each consumed Event object.
         Generates a file name using today's date and the event type.
@@ -113,7 +113,7 @@ class EventConsumerService(object):
 
         current_date = date.today().strftime("%d-%m-%Y")
 
-        file_name = '{0} - DATE={1}.log'.format(event_type_file_name, current_date)
+        file_name = '{0}-DATE={1}.log'.format(event_type_file_name, current_date)
 
         file_path_name = Path(event_directory_path, file_name)
         if file_path_name.exists():

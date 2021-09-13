@@ -20,7 +20,7 @@ class QueueService(object):
 
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host=self.RABBIT_DOMAIN,
+                host='localhost',
                 heartbeat=0,
                 blocked_connection_timeout=300,
             )
