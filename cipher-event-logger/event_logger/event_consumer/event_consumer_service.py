@@ -60,7 +60,7 @@ class EventConsumerService(object):
 
         try:
             self.logger.info(
-                f"Event Logging Received Message : {message}"
+                "Event Logging Received Message."
             )
             self.consume_message(message)
         except Exception as e:
@@ -82,13 +82,13 @@ class EventConsumerService(object):
         :param message_string: A BSON string
         """
 
-        self.logger.info(f'Logging events from other services.')
+        self.logger.info('Logging events from other services.')
 
         event_log_obj: EventLogObject = EventLogObject().to_obj(dict_data=bson.loads(message_string))
         if event_log_obj.log_level == 'ERROR':
             self.process_log(
                 event_directory_path=Path(EVENT_STORAGE_PATH, 'logged_errors'),
-                event_type_file_name='ERROR LOG',
+                event_type_file_name='ERROR',
                 event_log_object=event_log_obj
             )
         else:
@@ -116,10 +116,15 @@ class EventConsumerService(object):
         file_name = '{0}-DATE={1}.log'.format(event_type_file_name, current_date)
 
         file_path_name = Path(event_directory_path, file_name)
+        self.logger.info('Logging file exists: file_path_name [{0}] exists [{1}]'.format(file_path_name, file_path_name.exists()))
         if file_path_name.exists():
+            self.logger.info('File exists. Adding to file: [{0}]]'.format(file_path_name))
             self.save_log(event_log_object, file_path_name=file_path_name, append_file=True)
         else:
+            self.logger.info('Creating new file: [{0}]]'.format(file_path_name))
             self.save_log(event_log_object, file_path_name=file_path_name)
+
+        self.logger.info('Event log data saved.')
 
     def save_log(
         self, event_log_object: EventLogObject,

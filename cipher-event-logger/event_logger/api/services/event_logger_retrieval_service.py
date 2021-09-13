@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -11,23 +12,22 @@ class EventLoggerRetrievalService:
     event log file and logged data.
     """
 
-    def get_all_log_files(self, _path=EVENT_STORAGE_PATH, file_list=[]):
+    logger = logging.getLogger("cipher-event-logger")
+
+    def get_all_log_files(self, _path=EVENT_STORAGE_PATH,):
         """ Used to search each directory location recursively and build
         an array list of file names.
 
         :param _path: The path of the directory.
-        :param file_list: The list of file names.
         :returns: A list of file names.
         """
 
+        file_list = []
+        self.logger.info('File path [{0}], file_list [{1}]'.format(_path, ', '.join(file_list)))
         for root, dirs, files in os.walk(_path):
-            for sub_dir in dirs:
-                if sub_dir != '__pycache__':
-                    self.get_all_log_files(Path(EVENT_STORAGE_PATH, sub_dir), file_list=file_list)
             for file in files:
                 if '__init__' not in file:
                     file_list.append(file)
-
         return file_list
 
     def get_all_logs_by_file_name(self,  file_name, _path=EVENT_STORAGE_PATH):
