@@ -15,7 +15,7 @@ and log all events that occur on the api.
 
 ### Launching
 
-The micro-services run with docker.
+The micro-services application run with docker.
 
 Run the command: `docker-compose up` from this directory.
 
