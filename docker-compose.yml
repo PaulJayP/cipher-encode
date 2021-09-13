@@ -1,0 +1,59 @@
+version: "3"
+services:
+
+  cipher-rabbitmq:
+    image: rabbitmq:3.8.0-management
+    ports:
+    - "5672:5672"
+    - "15672:15672"
+    container_name: cipher-rabbitmq
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+  cipher-common:
+    build:
+      dockerfile: Dockerfile
+      context: ./cipher-common
+    image: cipher-common
+    depends_on:
+      - cipher-rabbitmq
+    container_name: cipher-builder
+
+  cipher-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./cipher-service
+    image: cipher-service
+    ports:
+      - "5001:5001"
+    container_name: cipher-service
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:5001"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    restart: on-failure
+    depends_on:
+      - cipher-rabbitmq
+      - cipher-common
+
+  cipher-event-logger:
+    build:
+      dockerfile: Dockerfile
+      context: ./cipher-event-logger
+    image: cipher-event-logger
+    ports:
+      - "5002:5002"
+    container_name: cipher-event-logger
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:5002"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    restart: on-failure
+    depends_on:
+      - cipher-rabbitmq
+      - cipher-common
