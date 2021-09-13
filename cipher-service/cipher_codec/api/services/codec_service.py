@@ -6,7 +6,7 @@ from common.models.codec_encrypt_request import CodecEncryptRequest
 
 class CodecService:
     """ Codec Service - Contains methods that are used to
-    encrypt/decrypt a payload using a given key and another other
+    encrypt/decrypt a payload using a given key and any another other
     required information.
     """
 
