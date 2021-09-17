@@ -50,6 +50,6 @@ class EventLogService(object):
         log_object.log_level = re.search(r'LEVEL: (?:\S)(?<=\[)(.*?)(?=\])]', event_message).group(1)
         log_object.log_module = re.search(r'MODULE: (?:\S)(?<=\[)(.*?)(?=\])]', event_message).group(1)
         log_object.log_function = re.search(r'FUNCTION: (?:\S)(?<=\[)(.*?)(?=\])]', event_message).group(1)
-        log_object.log_message = re.search(r'MESSAGE: (?:\S)(?<=\[)(.*?)(?=\])]', event_message).group(1)
+        log_object.log_message = re.search(r'MESSAGE: (?:\S)(?<=\[)(.*)(?=\])', event_message).group(1)
 
         return bson.dumps(log_object.to_dict())
