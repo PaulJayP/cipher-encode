@@ -1,7 +1,6 @@
 import json
 import logging
 
-from common import event_log_stream
 from common.custom_exceptions.codec_exceptions import CodecDecryptionException
 from common.custom_exceptions.model_load_exceptions import FieldKeyForbiddenBytesSize, FieldEmptyStringError
 from common.models.codec_decrypt_request import CodecDecryptRequest
@@ -60,8 +59,7 @@ class EncryptResource(Resource):
             )
 
             logger.info('Successfully encrypted text.')
-            logged_message = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_message)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps(encrypt_response),
@@ -76,8 +74,7 @@ class EncryptResource(Resource):
                 error_string += 'Field: [{0}]=Errors: [{1}]'.format(key, ', '.join(val))
 
             logger.error(error_string)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps({"message": error_string}),
@@ -88,23 +85,20 @@ class EncryptResource(Resource):
         except (FieldKeyForbiddenBytesSize, FieldEmptyStringError) as error_obj:
             # Fields errors
             logger.error(error_obj.message)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps({"message": error_obj.message}),
                 mimetype='application/json',
                 status=error_obj.status_code
             )
-
         except Exception as error_message:
             # Other generic exception
             logger.error(error_message)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
-                json.dumps({"message": error_message}),
+                json.dumps({"message": str(error_message)}),
                 mimetype='application/json',
                 status=500
             )
@@ -143,8 +137,7 @@ class DecryptResource(Resource):
             )
 
             logger.info('Successfully decrypted text.')
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps(decrypt_response),
@@ -159,8 +152,7 @@ class DecryptResource(Resource):
                 error_string += 'Field: [{0}]=Errors: [{1}]'.format(key, ', '.join(val))
 
             logger.error(error_string)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps({"message": error_string}),
@@ -170,8 +162,7 @@ class DecryptResource(Resource):
         except (FieldKeyForbiddenBytesSize, FieldEmptyStringError) as error_obj:
             # Fields errors
             logger.error(error_obj.message)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            EventLogService().log_event()
 
             return Response(
                 json.dumps({"message": error_obj.message}),
@@ -179,26 +170,22 @@ class DecryptResource(Resource):
                 status=error_obj.status_code
             )
         except CodecDecryptionException as error_obj:
-            # Codec decrypt exception
-            logger.error(error_obj.message)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            # Codec decrypt exception - don't log any decrypted data
             return Response(
                 json.dumps({
                     "message": error_obj.message,
-                    "plain_text": error_obj.error_args
+                    "error": error_obj.error_args
                 }),
                 mimetype='application/json',
                 status=error_obj.status_code
             )
         except Exception as error_message:
             # Other generic exception
-            logger.error(error_message)
-            logged_error = event_log_stream.getvalue()
-            EventLogService().event_log(message_log=logged_error)
+            logger.error(str(error_message))
+            EventLogService().log_event()
 
             return Response(
-                json.dumps({"message": error_message}),
+                json.dumps({"message": str(error_message)}),
                 mimetype='application/json',
                 status=500
             )

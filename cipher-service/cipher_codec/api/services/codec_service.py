@@ -42,5 +42,5 @@ class CodecService:
         try:
             cipher.verify(codec_decrypt_request_obj.tag)
             return plain_text
-        except ValueError:
-            raise CodecDecryptionException(error_args=plain_text)
+        except ValueError as err:
+            raise CodecDecryptionException(error_args=str(err))
